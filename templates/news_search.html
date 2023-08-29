@@ -1,0 +1,22 @@
+<! -- наследование шаблона default -->
+{% extends 'flatpages/default.html' %}
+
+{% block title %} Find News {% endblock title %}
+
+{% load custom_template_funcs %}
+
+<! -- начало контента -->
+{% block content %}
+
+
+<hr>
+<!-- Перед таблицей добавим форму для поиска -->
+<form action="{% url 'post_list' %}" method="GET">
+    {{ post_search.form }} <!-- Форму от фильтров за нас сделает django.
+    
+
+
+
+
+<! -- конец контента -->
+{% endblock content %}

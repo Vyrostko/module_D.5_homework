@@ -1,0 +1,13 @@
+<! -- наследование шаблона default -->
+{% extends 'flatpages/default.html' %}
+
+{% block title %} Post List {% endblock title %}
+
+{% block content %}
+<h3>Удаление поста</h3>
+<form method="POST" action="">
+    {% csrf_token %}
+    <p>Вы действительно хотите удалить пост "{{ object.header }}" от {{ delete_post_form.post_date|date:'d.m.Y' }}?</p>
+    <input type="submit" value="Удалить" />
+</form>
+{% endblock content %}

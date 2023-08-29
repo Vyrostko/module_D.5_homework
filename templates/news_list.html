@@ -1,0 +1,114 @@
+<style type="text/css">
+    TABLE {
+        background: rgb(255, 255, 255); /* Цвет фона таблицы */
+        border: 5px double #ffffff; /* Рамка вокруг таблицы */
+        color: black;
+        width: 100%; /* Ширина таблицы */
+        border: 1px solid rgb(255, 255, 255); /* Граница вокруг таблицы */
+        border-spacing: 7px 5px; /* Расстояние между границ */
+        padding: 10px;
+    }
+    TD, TH {
+        
+        border: 30px solid rgba(255, 255, 255, 0.1); /* Граница вокруг ячеек */
+        padding: 5px; /* Поля в ячейках */      
+    }
+    h2, h1 {
+        text-align: center; /* Выравнивание по центру */
+    }
+   </style>
+  
+  <! -- наследование шаблона default -->
+  {% extends 'flatpages/default.html' %}
+  
+  {% block title %} News {% endblock title %}
+  
+  {% load custom_template_funcs %}
+  
+  <! -- начало контента -->
+  {% block content %}
+  
+  <h1>Поиск</h1>
+  <h6>Всего постов: {{ all_news_count }}</h6>
+  <h6>Найдено постов: {{ posts_found }}</h6>
+  {# <hr> #}
+  {# <h6>Список новостей: {{ object_list }}</h6> #}
+  
+  {# согласно синтаксису языка шаблонов Django, #}
+  <! переменные должны быть окружены двойными фигурными скобками {{ news }} >
+  {# а теги в одну фигурную скобку и символ "%": {% news %} пишутся, когда нужно задать условие #}
+  <!-- Перед таблицей добавим форму для поиска -->
+  <form method="GET">
+      {{ post_search.form }} 
+     
+      <input type="submit" value="Найти">
+  </form>
+  <hr>
+  
+  {% load my_tags %}
+  
+  {% if object_list %}
+  <h1>Новости</h1>
+      <table>
+          <tr>
+              <td valign="top" align="center"><b>№ поста</b></td>
+              <td align="center"><b>Автор</b></td>
+              <td align="center"><b>Заголовок<p></b></td>
+              <td align="center"><b>Дата публикации</b></td>
+              <td align="center"><b>Описание </b></td>
+          </tr>
+          {% for post in object_list %}
+          <tr>
+              <td align="center">{{ post.id }}</td>
+              <td align="center">{{ post.author }}</td>
+              <td align="center">
+                  <!-- гиперсслыка -->
+                  <a href="{% url 'post_details' post.id %}">
+                      {{ post.header|default:"Без заголовка"|censor:'***' }}
+                  </a>
+                  {% if user.is_authenticated %}
+                    <a href="{% url 'edit_post_form' post.pk %}"> (edit)</a>
+                    <a href="{% url 'delete_post_form' post.pk %}"> (delete)</a>
+                  {% endif %}
+              </td>
+              <td align="center">{{ post.post_date|default:"Без даты"|date:'d.m.Y' }}</td>
+              <td>
+                  {#{ post.body|truncatechars:20|censor:'***' }#}
+                  {{ post.body|censor:'***'|truncatewords:15 }}
+              </td>
+          {% endfor %}
+          </tr>
+      </table>
+  {% else %}
+  <h2>
+      Новостей нет!
+  </h2>
+  {% endif %}
+  
+  <br>
+  
+  <!-- блок пагинатора -->
+  
+  {% if is_paginated %}
+    {% if page_obj.has_previous %}
+      <a href="?{% param_replace page=1 %}">First</a>
+      {% if page_obj.previous_page_number != 1 %}
+        <a href="?{% param_replace page=page_obj.previous_page_number %}">Previous</a>
+      {% endif %}
+    {% endif %}
+  
+    Page {{ page_obj.number }} of {{ paginator.num_pages }}
+  
+    {% if page_obj.has_next %}
+      {% if page_obj.next_page_number != paginator.num_pages %}
+        <a href="?{% param_replace page=page_obj.next_page_number %}">Next</a>
+      {% endif %}
+      <a href="?{% param_replace page=paginator.num_pages %}">Last</a>
+    {% endif %}
+  
+    <p>Objects {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
+  {% endif %}
+  <!-- блок пагинатора -->
+  
+  <! -- конец контента -->
+  {% endblock content %}
